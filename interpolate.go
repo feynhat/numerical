@@ -4,8 +4,29 @@ import (
 	//"math"
 )
 
+func LagrangeInterpolPoly(nodes, vals []float64) Poly {
+	n := len(nodes)-1
+	result := Poly{[]float64{0}}
+	lagrangePolys := make([]Poly, n+1)
+	for i := 0; i <= n; i++ {
+		num := Poly{[]float64{1}}
+		den := 1.0
+		for j := 0; j <= n; j++ {
+			if j != i {
+				num = PolyMul(num, Poly{[]float64{-nodes[j], 1}})
+				den *= (nodes[i] - nodes[j])
+			}
+		}
+		lagrangePolys[i] = PolyMul(num, Poly{[]float64{1/den}})
+	}
+	for i := 0; i <= n; i++ {
+		result = PolyAdd(result, PolyMul(Poly{[]float64{vals[i]}}, lagrangePolys[i]))
+	}
+	return result
+}
+
 func NewtonDivDiffTab(nodes, vals []float64) [][]float64 {
-	n := len(vals)-1
+	n := len(nodes)-1
 	divDiffTab := make([][]float64, n+1)
 	for i := 0; i < n+1; i++ {
 		divDiffTab[i] = make([]float64, n+1)
@@ -28,9 +49,9 @@ func NewtonDivDiff(nodes, vals []float64) Poly {
 	result := Poly{[]float64{multipliers[0]}}
 	nodePoly := Poly{[]float64{1}}
 	for i := 1; i <= n; i++ {
-		nodePoly = Multiply(nodePoly, Poly{[]float64{-nodes[i-1], 1}})
+		nodePoly = PolyMul(nodePoly, Poly{[]float64{-nodes[i-1], 1}})
 		constMultiplier := Poly{[]float64{multipliers[i]}}
-		result = Add(result, Multiply(constMultiplier, nodePoly))
+		result = PolyAdd(result, PolyMul(constMultiplier, nodePoly))
 	}
 	return result
 }

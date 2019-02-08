@@ -2,8 +2,6 @@ package numerical
 
 import (
 	"strconv"
-	//"fmt"
-	//"math"
 )
 
 type Poly struct {
@@ -73,7 +71,7 @@ func (p *Poly) Eval(x float64) float64 {
 	return val
 }
 
-func Add(p, q Poly) Poly {
+func PolyAdd(p, q Poly) Poly {
 	var big, small, r Poly
 	if p.Deg() > q.Deg() {
 		big = p
@@ -89,7 +87,26 @@ func Add(p, q Poly) Poly {
 	return r
 }
 
-func Multiply(p, q Poly) Poly {
+func PolySub(p, q Poly) Poly {
+	degp := p.Deg()
+	degq := q.Deg()
+	big := degp
+	if degp < degq {
+		big = degq
+	}
+	r := Poly{make([]float64, big+1)}
+	for i := 0; i <= big; i++ {
+		if i <= degp {
+			r.Coeffs[i] = p.Coeffs[i]
+		}
+		if i <= degq {
+			r.Coeffs[i] -= q.Coeffs[i]
+		}
+	}
+	return r
+}
+
+func PolyMul(p, q Poly) Poly {
 	m, n := p.Deg(), q.Deg()
 	r := Poly{make([]float64, m+n+1)}
 	for i := 0; i <= m; i++ {
@@ -98,4 +115,11 @@ func Multiply(p, q Poly) Poly {
 		}
 	}
 	return r
+}
+
+func PolyDiv(a, b Poly) (Poly, Poly) {
+	//dega := a.Deg()
+	//degb := b.Deg()
+	var p, q Poly
+	return p, q
 }
