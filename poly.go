@@ -8,6 +8,10 @@ type Poly struct {
 	Coeffs []float64
 }
 
+func NewPoly (deg int) Poly {
+	return Poly{make([]float64, deg+1)}
+}
+
 func (p *Poly) Str() string {
 	d := p.Deg()
 
@@ -72,17 +76,22 @@ func (p *Poly) Eval(x float64) float64 {
 }
 
 func PolyAdd(p, q Poly) Poly {
-	var big, small, r Poly
+	degp := p.Deg()
+	degq := q.Deg()
+	var degr int
 	if p.Deg() > q.Deg() {
-		big = p
-		small = q
+		degr = p.Deg()
 	} else {
-		big = q
-		small = p
+		degr = q.Deg()
 	}
-	r = big
-	for i := 0; i <= small.Deg(); i+=1 {
-		r.Coeffs[i] += small.Coeffs[i]
+	r := NewPoly(degr)
+	for i := 0; i <= degr; i+=1 {
+		if i <= degp {
+			r.Coeffs[i] = p.Coeffs[i]
+		}
+		if i <= degq {
+			r.Coeffs[i] += q.Coeffs[i]
+		}
 	}
 	return r
 }
@@ -118,8 +127,16 @@ func PolyMul(p, q Poly) Poly {
 }
 
 func PolyDiv(a, b Poly) (Poly, Poly) {
-	//dega := a.Deg()
-	//degb := b.Deg()
-	var p, q Poly
-	return p, q
+	var q Poly
+	for b.Deg() <= a.Deg() {
+		dega := a.Deg()
+		degb := b.Deg()
+		qc := a.Coeffs[dega]/b.Coeffs[degb]
+		qp := dega - degb
+		qi := Poly{make([]float64, qp+1)}
+		qi.Coeffs[qp] = qc
+		a = PolySub(a, PolyMul(qi, b))
+		q = PolyAdd(q, qi)
+	}
+	return q, a
 }

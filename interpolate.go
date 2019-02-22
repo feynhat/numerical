@@ -55,3 +55,40 @@ func NewtonDivDiff(nodes, vals []float64) Poly {
 	}
 	return result
 }
+
+func ForwardDiffTab(vals []float64) [][]float64 {
+	n := len(vals)-1
+	forwDiffTab := make([][]float64, n+1)
+	for i := 0; i < n+1; i++ {
+		forwDiffTab[i] = make([]float64, n+1)
+	}
+	for i := 0; i <= n; i++ {
+		forwDiffTab[i][0] = vals[i]
+	}
+	for j := 1; j <= n; j++ {
+		for i := 0; i <= n-j; i++ {
+			forwDiffTab[i][j] = forwDiffTab[i+1][j-1] - forwDiffTab[i][j-1]
+		}
+	}
+	return forwDiffTab
+}
+
+func ForwardDiffInterpolation(start, space float64, vals []float64) Poly {
+	n := len(vals) - 1
+	delta := ForwardDiffTab(vals)
+	res := Poly{[]float64{delta[0][0]}}
+	cm := Poly{[]float64{1}}
+	pm := Poly{[]float64{1}}
+	mu := Poly{[]float64{-start, 1}}
+	fact := 1
+	pow := 1.0
+	for j := 1; j <= n; j++ {
+		pow *= space
+		fact *= j
+		cm = PolyMul(Poly{[]float64{delta[0][j]}}, Poly{[]float64{1.0/(float64(fact)*pow)}})
+		mu = Poly{[]float64{-start - space*float64(j-1), 1}}
+		pm = PolyMul(pm, mu)
+		res = PolyAdd(res, PolyMul(cm, pm))
+	}
+	return res
+}
