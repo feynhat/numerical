@@ -12,7 +12,7 @@ func NewPoly (deg int) Poly {
 	return Poly{make([]float64, deg+1)}
 }
 
-func (p *Poly) Str() string {
+func (p Poly) Str() string {
 	d := p.Deg()
 
 	if d == -1 {
@@ -65,7 +65,7 @@ func (p *Poly) Deg() int {
 	return i
 }
 
-func (p *Poly) Eval(x float64) float64 {
+func (p Poly) Eval(x float64) float64 {
 	val := p.Coeffs[0]
 	pow := 1.0
 	for i:=1; i <= p.Deg(); i+=1 {
@@ -139,4 +139,13 @@ func PolyDiv(a, b Poly) (Poly, Poly) {
 		q = PolyAdd(q, qi)
 	}
 	return q, a
+}
+
+func (p Poly) Derivative() Poly {
+	n := p.Deg()
+	res := NewPoly(n-1)
+	for i := 1; i <= n; i++ {
+		res.Coeffs[i-1] = float64(i)*p.Coeffs[i]
+	}
+	return res
 }
