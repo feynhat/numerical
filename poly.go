@@ -78,10 +78,8 @@ func (p Poly) Eval(x float64) float64 {
 func PolyAdd(p, q Poly) Poly {
 	degp := p.Deg()
 	degq := q.Deg()
-	var degr int
-	if p.Deg() > q.Deg() {
-		degr = p.Deg()
-	} else {
+	degr := degp
+	if q.Deg() > p.Deg() {
 		degr = q.Deg()
 	}
 	r := NewPoly(degr)
@@ -99,12 +97,12 @@ func PolyAdd(p, q Poly) Poly {
 func PolySub(p, q Poly) Poly {
 	degp := p.Deg()
 	degq := q.Deg()
-	big := degp
-	if degp < degq {
-		big = degq
+	degr := degp
+	if q.Deg() > p.Deg() {
+		degr = q.Deg()
 	}
-	r := Poly{make([]float64, big+1)}
-	for i := 0; i <= big; i++ {
+	r := NewPoly(degr)
+	for i := 0; i <= degr; i++ {
 		if i <= degp {
 			r.Coeffs[i] = p.Coeffs[i]
 		}
